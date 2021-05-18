@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
+//import $ from "jquery";
 
 //FAKE DATA
 const itemsFromBackend = [
@@ -95,6 +96,7 @@ function Task(props) {
 
 function Column(props) {
   /* Contains the task */
+  //TODO: not sure if key in <Task/> is right
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <h2>{props.column.name}</h2>
@@ -116,6 +118,7 @@ function Column(props) {
                 {props.column.items.map((item, index) => {
                   return (
                     <Task
+                    key={index}
                     item={item}
                     index={index} />
                   )
@@ -131,12 +134,14 @@ function Column(props) {
 }
 
 function KanbanBoard(props) {
+  //TODO: not sure if key in <Column/> is right
   return (
     <div style={{ display: 'flex', justifyContent: 'center', height: '100%' }} >
       <DragDropContext onDragEnd={result => onDragEnd(result, props.columns, props.setColumns)}>
         {Object.entries(props.columns).map(([id, column]) => { //we want to iterate over our droppables (i.e. columns)
           return (
             <Column
+            key={id}
             id={id}
             column={column}/>
           )
@@ -146,13 +151,104 @@ function KanbanBoard(props) {
   )
 }
 
-function App() {
-  const [columns, setColumns] = useState(columnsFromBackend);
-  return (
-    <KanbanBoard
-    columns={columns}
-    setColumns={setColumns} />
-  );
+class AddTask extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleInputTextChange = this.handleInputTextChange.bind(this);
+    this.handleTaskClick = this.handleTaskClick.bind(this);
+  }
+  
+  handleInputTextChange(e) {
+    this.props.onInputTextChange(e.target.value);
+  }
+
+  handleTaskClick(e) {
+    // console.log($('textarea').val());
+    this.props.onClick(e);
+    // console.log(this.props.inputText);
+  }
+
+  render () {
+    return (
+      <div style={{paddingLeft: '20px',paddingTop: '20px'}}>
+        <form>    
+          <textarea name="textarea"
+          type="text"
+          value={this.props.inputText}
+          onChange={this.handleInputTextChange}
+          />
+          <button 
+          onClick={this.handleTaskClick}
+          style={{justifyContent: 'center', display: 'flex'}}>
+          Add task
+          </button>
+          
+        </form>
+      </div>
+    );
+  };
+}
+
+class App extends React.Component {
+  //const [columns, setColumns] = useState(columnsFromBackend);
+  constructor(props) {
+    super(props);
+    this.state = {
+      columns : columnsFromBackend,
+      inputText: ''
+    };
+    this.setColumns = this.setColumns.bind(this);
+    this.handleInputTextChange = this.handleInputTextChange.bind(this);
+    this.handleTaskClick = this.handleTaskClick.bind(this);
+  }
+  
+  setColumns(columns) {
+    this.setState({
+      columns: columns
+    });
+  }
+
+  handleInputTextChange(inputText) {
+    this.setState({
+      inputText: inputText
+    });
+  }
+
+  handleTaskClick(e) {
+    e.preventDefault(); //no page reload
+    let new_task = this.state.inputText;
+    let updated_cols = this.state.columns
+    let req_key;
+    //Looping over json to find 'Requested', maybe not necessary with a good API
+    for (var key in updated_cols) { 
+      if (updated_cols[key]['name'] == 'Requested') {
+        req_key = key;
+        break;
+      };
+    }
+    updated_cols[req_key]['items'].push({id: uuid(), content: new_task})
+    this.setState({
+      columns: updated_cols,
+      inputText: ''
+    })
+  };
+
+  render () {
+    return(
+    <div>
+      <AddTask 
+        columns={this.state.columns} 
+        inputText = {this.state.inputText}
+        onInputTextChange={this.handleInputTextChange}
+        onClick={this.handleTaskClick}/>
+
+      <KanbanBoard
+      columns={this.state.columns}
+      setColumns={this.setColumns} />
+    </div>
+    );
+  };
 }
 
 export default App;

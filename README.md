@@ -1,4 +1,12 @@
-# Getting Started with Create React App
+# kanban-board
+
+## TODO
+- Want to figure out how backend ties into this, for rendering and updating
+- Give tasks a `clear` button, and when clicked asked 'are you sure'?
+
+# Documentation for npx: Getting Started with Create React App
+## Dependencies
+`yarn add uuid react-beautiful-dnd                            `
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -68,4 +76,3 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# kanban-board
