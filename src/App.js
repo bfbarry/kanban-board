@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
 
+//FAKE DATA
 const itemsFromBackend = [
   {id: uuid(), content: 'First task'},
   {id: uuid(), content: 'Second task'}
@@ -26,6 +27,7 @@ const columnsFromBackend =
       items: []
     }
   };
+
 
 const onDragEnd = (result, columns, setColumns) => {
   // gets IDs from draggable items to keep track of them upon dragging
@@ -63,69 +65,93 @@ const onDragEnd = (result, columns, setColumns) => {
       }
     });
   }
-  
 };
 
-function App() {
-  const [columns, setColumns] = useState(columnsFromBackend);
+function Task(props) {
+  return (
+    <Draggable key={props.item.id} draggableId={props.item.id} index={props.index}>
+    {(provided, snapshot) => {
+      return (
+        <div 
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={{
+          userSelect: 'none', //so not blue everywhere when dropping
+          padding: 16,
+          margin: '0 0 8px 0',
+          minHeight: '50px',
+          backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
+          color: 'white',
+          ...provided.draggableProps.style
+        }}>
+          {props.item.content}
+        </div>
+      )
+    }}
+  </Draggable>
+  )
+}
+
+function Column(props) {
+  /* Contains the task */
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      <h2>{props.column.name}</h2>
+      <div style={{margin: 8}}>
+        <Droppable key={props.id} droppableId={props.id}>
+          {(provided, snapshot) => {
+            return ( //ref is reference to inner DOM
+                    // ... unpacks props
+              <div 
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                style={{
+                  background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
+                  padding: 4,
+                  width: 250,
+                  minHeight: 500
+                }} >
+
+                {props.column.items.map((item, index) => {
+                  return (
+                    <Task
+                    item={item}
+                    index={index} />
+                  )
+                })}
+                {provided.placeholder}
+              </div>
+            )
+          }}
+        </Droppable>
+      </div>
+    </div>
+  )
+}
+
+function KanbanBoard(props) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', height: '100%' }} >
-      <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
-        {Object.entries(columns).map(([id, column]) => { //we want to iterate over our droppables (i.e. columns)
+      <DragDropContext onDragEnd={result => onDragEnd(result, props.columns, props.setColumns)}>
+        {Object.entries(props.columns).map(([id, column]) => { //we want to iterate over our droppables (i.e. columns)
           return (
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-              <h2>{column.name}</h2>
-              <div style={{margin: 8}}>
-                <Droppable key={id} droppableId={id}>
-                  {(provided, snapshot) => {
-                    return ( //ref is reference to inner DOM
-                            // ... unpacks props
-                      <div 
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        style={{
-                          background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
-                          padding: 4,
-                          width: 250,
-                          minHeight: 500
-                        }} >
-
-                        {column.items.map((item, index) => {
-                          return (
-                            <Draggable key={item.id} draggableId={item.id} index={index}>
-                              {(provided, snapshot) => {
-                                return (
-                                  <div 
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={{
-                                    userSelect: 'none', //so not blue everywhere when dropping
-                                    padding: 16,
-                                    margin: '0 0 8px 0',
-                                    minHeight: '50px',
-                                    backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
-                                    color: 'white',
-                                    ...provided.draggableProps.style
-                                  }}>
-                                    {item.content}
-                                  </div>
-                                )
-                              }}
-                            </Draggable>
-                          )
-                        })}
-                        {provided.placeholder}
-                      </div>
-                    )
-                  }}
-                </Droppable>
-              </div>
-            </div>
+            <Column
+            id={id}
+            column={column}/>
           )
         })}
       </DragDropContext>
     </div>
+  )
+}
+
+function App() {
+  const [columns, setColumns] = useState(columnsFromBackend);
+  return (
+    <KanbanBoard
+    columns={columns}
+    setColumns={setColumns} />
   );
 }
 
