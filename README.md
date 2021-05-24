@@ -2,7 +2,12 @@
 
 ## TODO
 - Want to figure out how backend ties into this, for rendering and updating
-- Give tasks a `clear` button, and when clicked asked 'are you sure'?
+- When clicking remove button ask 'are you sure'?
+    - better css
+- Restrict task div text wrap
+
+## Resources
+- https://stackoverflow.com/questions/47135473/react-create-a-delete-button-that-removes-its-dom-parent-and-corresponding-st
 
 # Documentation for npx: Getting Started with Create React App
 ## Dependencies
