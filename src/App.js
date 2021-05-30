@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
-//import $ from "jquery";
+import $ from "jquery";
 
 //FAKE DATA
 const itemsFromBackend = [
@@ -28,6 +28,7 @@ const columnsFromBackend =
       items: []
     }
   };
+
 
 
 const onDragEnd = (result, columns, setColumns) => {
@@ -82,17 +83,39 @@ class RmTask extends React.Component {
     return (
         <button 
           onClick={this.handleRmTaskClick}
+          type="button"
+          class="btn" 
           style={{
                 // float: 'right',
                   // padding:0,
                   position:'absolute',
-                  top: 5,
-                  right: 5,
-                  cursor: 'pointer'}}>
-          X
+                  top: 0.1,
+                  right: 0.1,
+                  }}>
+              <span class="icon-archive">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="#ff947a" width="16" height="16" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/></svg>
+              </span>
           </button>
     );
   };
+}
+
+
+
+function linkify(str) {
+    var newStr = str.replace(/(<a href=")?((https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)))(">(.*)<\/a>)?/gi, function () {
+
+        return '<a href="' + arguments[2] + '">' + (arguments[7] || arguments[2]) + '</a>'
+    });
+    console.log(newStr)
+    $('task-div').html(newStr) //fill output area
+    
+}
+
+function TaskText(props) {
+  return (
+    props.text
+    )
 }
 
 class Task extends React.Component {
@@ -113,23 +136,27 @@ class Task extends React.Component {
       {(provided, snapshot) => {
         return (
           <div 
+          id='task-div'
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           style={{
             userSelect: 'none', //so not blue everywhere when dropping
             padding: 16,
-            paddingTop: 23,
+            paddingTop: 25,
             margin: '0 0 8px 0',
             minHeight: '50px',
-            backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
-            color: 'white',
+            backgroundColor: snapshot.isDragging ? '#d7f760' : '#edffab',
+            color: 'black',
             wordWrap: 'break-word',
             position: 'relative',
             borderRadius: 12,
             ...provided.draggableProps.style
           }}>
             {this.props.item.content}
+            {/* <TaskText
+            text={this.props.item.content}
+            /> */}
   
           <RmTask 
             index={this.props.index} 
@@ -243,23 +270,22 @@ class AddTask extends React.Component {
   }
 
   handleAddTaskClick(e) {
-    // console.log($('textarea').val());
     this.props.onClick(e);
-    // console.log(this.props.inputText);
   }
 
   render () {
     return (
       <div style={{
-        padding: 20,
-        width: 200,
-        height: 200,
+        class:'form-actions',
+        textAlign: 'center',
+        padding: 15,
+        width: 210,
+        height: 230,
         borderRadius: 10,
         margin: 20,
         marginTop: 100,
-        // alignItems: 'center',
         float: 'left',
-        backgroundColor: '#a8fff1',}}>
+        backgroundColor: '#abd0ff',}}>
         <form>    
           <textarea name="textarea"
           type="text"
@@ -267,13 +293,14 @@ class AddTask extends React.Component {
           onChange={this.handleInputTextChange}
           style={{
             resize: 'none',
-            padding:10,
             height:160,
           }}
           />
           <button 
+          type="submit"
+          class='btn btn-primary'
           onClick={this.handleAddTaskClick}
-          style={{justifyContent: 'center', display: 'flex',textAlign: 'center',}}>
+          >
           Add task
           </button>
           
@@ -332,29 +359,29 @@ class App extends React.Component {
 
   handleRmTaskClick(removeIndex) {
     if (window.confirm("Confirm task deletion")) {
-    let updated_cols = this.state.columns;
-    let rm_key;
-    let item_ix;
-    //same looping as for handleAddTaskClick()
-    loop:
-      for (var key in updated_cols) {
-        for (var i = 0; i < updated_cols[key]['items'].length; i++) {
-          if (updated_cols[key]['items'][i]['id'] === removeIndex) {
-            rm_key = key;
-            item_ix = i;
-            break loop;
-          }
-          
-        };
-      }
-    updated_cols[rm_key]['items'].splice(item_ix, 1)
-    this.setState({
-      columns: updated_cols,
-    })
-  } else {
+      let updated_cols = this.state.columns;
+      let rm_key;
+      let item_ix;
+      //same looping as for handleAddTaskClick()
+      loop:
+        for (var key in updated_cols) {
+          for (var i = 0; i < updated_cols[key]['items'].length; i++) {
+            if (updated_cols[key]['items'][i]['id'] === removeIndex) {
+              rm_key = key;
+              item_ix = i;
+              break loop;
+            }
+            
+          };
+        }
+      updated_cols[rm_key]['items'].splice(item_ix, 1)
+      this.setState({
+        columns: updated_cols,
+      })
+      /* remove task from DB  SOMEWHERE HERE */
+  } 
+  else {}
     
-  }
-    /* remove task from DB  SOMEWHERE HERE */
   };
 
   render () {
@@ -374,5 +401,9 @@ class App extends React.Component {
     );
   };
 }
+
+// var data = $('div').html();
+// console.log(data);
+// linkify(data);
 
 export default App;
