@@ -80,12 +80,17 @@ class RmTask extends React.Component {
 
   render () {
     return (
-          <button 
+        <button 
           onClick={this.handleRmTaskClick}
-          style={{float: 'right'}}>
+          style={{
+                // float: 'right',
+                  // padding:0,
+                  position:'fixed',
+                  top: 10,
+                  right: 10,
+                  cursor: 'pointer'}}>
           X
           </button>
-          
     );
   };
 }
@@ -118,6 +123,8 @@ class Task extends React.Component {
             minHeight: '50px',
             backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
             color: 'white',
+            wordWrap: 'break-word',
+            zIndex:200,
             ...provided.draggableProps.style
           }}>
             {this.props.item.content}
