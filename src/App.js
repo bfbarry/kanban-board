@@ -85,9 +85,9 @@ class RmTask extends React.Component {
           style={{
                 // float: 'right',
                   // padding:0,
-                  position:'fixed',
-                  top: 10,
-                  right: 10,
+                  position:'absolute',
+                  top: 5,
+                  right: 5,
                   cursor: 'pointer'}}>
           X
           </button>
@@ -119,12 +119,14 @@ class Task extends React.Component {
           style={{
             userSelect: 'none', //so not blue everywhere when dropping
             padding: 16,
+            paddingTop: 23,
             margin: '0 0 8px 0',
             minHeight: '50px',
             backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
             color: 'white',
             wordWrap: 'break-word',
-            zIndex:200,
+            position: 'relative',
+            borderRadius: 12,
             ...provided.draggableProps.style
           }}>
             {this.props.item.content}
@@ -172,7 +174,8 @@ class Column extends React.Component {
                     background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
                     padding: 4,
                     width: 250,
-                    minHeight: 500
+                    minHeight: 500,
+                    borderRadius: 12,
                   }} >
   
                   {this.props.column.items.map((item, index) => {
@@ -247,16 +250,30 @@ class AddTask extends React.Component {
 
   render () {
     return (
-      <div style={{paddingLeft: '20px',paddingTop: '20px'}}>
+      <div style={{
+        padding: 20,
+        width: 200,
+        height: 200,
+        borderRadius: 10,
+        margin: 20,
+        marginTop: 100,
+        // alignItems: 'center',
+        float: 'left',
+        backgroundColor: '#a8fff1',}}>
         <form>    
           <textarea name="textarea"
           type="text"
           value={this.props.inputText}
           onChange={this.handleInputTextChange}
+          style={{
+            resize: 'none',
+            padding:10,
+            height:160,
+          }}
           />
           <button 
           onClick={this.handleAddTaskClick}
-          style={{justifyContent: 'center', display: 'flex'}}>
+          style={{justifyContent: 'center', display: 'flex',textAlign: 'center',}}>
           Add task
           </button>
           
@@ -314,7 +331,8 @@ class App extends React.Component {
   };
 
   handleRmTaskClick(removeIndex) {
-    let updated_cols = this.state.columns
+    if (window.confirm("Confirm task deletion")) {
+    let updated_cols = this.state.columns;
     let rm_key;
     let item_ix;
     //same looping as for handleAddTaskClick()
@@ -333,7 +351,9 @@ class App extends React.Component {
     this.setState({
       columns: updated_cols,
     })
+  } else {
     
+  }
     /* remove task from DB  SOMEWHERE HERE */
   };
 
